@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fetishdle</title>
     <style>
-        /* --- CORES E VARIÁVEIS --- */
+        /* --- CORES E VARIÁVEIS (CLARO E ESCURO) --- */
         :root {
             --correct: #538d4e;
             --present: #b59f3b;
@@ -17,11 +17,9 @@
             --hint-bg: #2c2c2e;
             --hint-text: #4dbce9;
             --overlay-bg: rgba(0, 0, 0, 0.85);
-            
-            /* Altura máxima do tabuleiro para não espremer demais */
-            --board-max-width: 450px; 
         }
 
+        /* Definições do Modo Claro */
         [data-theme="light"] {
             --correct: #6aaa64;
             --present: #c9b458;
@@ -44,12 +42,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: space-between; /* Espalha conteúdo */
             margin: 0;
-            padding: 0;
-            /* Usa dvh para lidar com barras de navegador mobile */
-            height: 100dvh; 
-            width: 100vw;
-            overflow: hidden;
+            height: 100vh; /* Altura total da viewport */
+            overflow: hidden; /* Evita scroll no mobile */
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -59,22 +55,19 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            max-width: var(--board-max-width);
-            padding: 10px 15px;
+            max-width: 600px;
+            padding: 10px 20px;
             border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0; /* Não deixa encolher */
-            height: 50px;
         }
 
-        h1 { margin: 0; font-size: 20px; letter-spacing: 2px; }
+        h1 { margin: 0; font-size: 24px; letter-spacing: 2px; }
 
         .theme-btn {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 24px;
             color: var(--text-color);
-            padding: 0;
         }
 
         /* --- ÁREA CENTRAL (DICA + TABULEIRO) --- */
@@ -83,82 +76,71 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* Centraliza verticalmente */
+            justify-content: center;
             width: 100%;
-            max-width: 600px;
+            overflow-y: auto;
             padding: 10px;
-            overflow: hidden; /* Evita scroll indesejado */
-            min-height: 0; /* Permite que o container encolha se necessário */
         }
 
-        #message-area {
-            height: 20px;
-            min-height: 20px;
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            color: var(--text-color);
-        }
-
-        /* --- TABULEIRO RESPONSIVO --- */
-        #game-board-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            max-height: 100%;
-            overflow: hidden;
-        }
-
-        #game-board {
-            display: grid;
-            grid-gap: 5px;
-            width: 100%;
-            /* Limita a largura para não ficar gigante em desktop */
-            max-width: var(--board-max-width); 
-            /* Aspect ratio garante que não estique verticalmente demais */
-            margin: 0 auto;
-        }
-
-        .tile {
-            width: 100%; /* Ocupa 100% da célula do grid */
-            aspect-ratio: 1 / 1; /* Mantém quadrado */
-            border: 2px solid var(--border-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            text-transform: uppercase;
-            user-select: none;
-            /* Fonte fluida baseada na largura da célula, mas limitada */
-            font-size: clamp(12px, 4.5vw, 30px); 
-            transition: transform 0.25s, border-color 0.25s, background-color 0.25s;
-        }
-
-        /* --- DICA --- */
         #hint-container {
             background-color: var(--hint-bg);
-            padding: 8px 12px;
+            padding: 8px 15px;
             border-radius: 8px;
-            margin-top: 10px;
-            margin-bottom: 5px;
+            margin-bottom: 15px;
             text-align: center;
-            font-size: clamp(11px, 3vw, 14px);
-            max-width: 95%;
+            font-size: 14px;
+            max-width: 90%;
             border: 1px solid var(--border-color);
-            flex-shrink: 0;
         }
 
         #hint-text { font-weight: bold; color: var(--hint-text); }
 
+        #message-area {
+            height: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* --- TABULEIRO --- */
+        #game-board {
+            display: grid;
+            grid-gap: 5px;
+            margin-bottom: 10px;
+            max-width: 100%;
+        }
+
+        .tile {
+            width: 45px;
+            height: 45px;
+            border: 2px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            user-select: none;
+            transition: transform 0.25s, border-color 0.25s, background-color 0.25s;
+        }
+
+        /* Responsividade do Tabuleiro */
+        .tile.small-text { font-size: 14px; width: 32px; height: 32px; }
+        .tile.tiny-text { font-size: 10px; width: 22px; height: 22px; }
+
         /* --- ANIMAÇÕES --- */
+        /* Pop ao digitar */
         .pop { animation: pop 0.1s; }
         @keyframes pop { 50% { transform: scale(1.1); } }
 
-        .flip { transform: rotateX(90deg); transition: transform 0.25s ease-in; }
+        /* Flip ao revelar */
+        .flip {
+            transform: rotateX(90deg); /* Começa a girar */
+            transition: transform 0.25s ease-in;
+        }
 
+        /* Shake ao errar */
         .shake { animation: shake 0.5s; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -166,24 +148,22 @@
             20%, 40%, 60%, 80% { transform: translateX(4px); }
         }
 
+        /* Estados das Cores (CSS Classes) */
         .correct { background-color: var(--correct); border-color: var(--correct); color: white; }
         .present { background-color: var(--present); border-color: var(--present); color: white; }
         .absent { background-color: var(--absent); border-color: var(--absent); color: white; }
 
-        /* --- TECLADO VIRTUAL RESPONSIVO --- */
+        /* --- TECLADO VIRTUAL --- */
         #keyboard-container {
             width: 100%;
-            max-width: var(--board-max-width);
-            padding: 5px;
+            max-width: 600px;
+            padding: 10px 5px;
             background-color: var(--default-bg);
-            flex-shrink: 0; /* Garante que o teclado nunca seja esmagado */
-            padding-bottom: max(10px, env(safe-area-inset-bottom)); /* Espaço para barra do iPhone */
         }
 
         .keyboard-row {
             display: flex;
             justify-content: center;
-            width: 100%;
             margin-bottom: 6px;
             touch-action: manipulation;
         }
@@ -193,44 +173,30 @@
             font-weight: bold;
             border: 0;
             padding: 0;
-            margin: 0 2px; /* Margem menor para telas pequenas */
-            height: 48px; /* Altura de toque confortável */
+            margin: 0 3px;
+            height: 50px;
             border-radius: 4px;
             cursor: pointer;
             user-select: none;
             background-color: var(--key-bg);
             color: var(--text-color);
-            flex: 1; /* Distribui espaço igualmente */
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
             text-transform: uppercase;
-            font-size: 13px;
+            font-size: 14px;
             transition: background-color 0.3s;
         }
 
-        .key-wide { flex: 1.5; font-size: 11px; }
-
-        /* Ajustes para telas MUITO pequenas (ex: iPhone SE, Galaxy Fold) */
-        @media (max-width: 360px) {
-            .key { height: 42px; font-size: 12px; margin: 0 1px; }
-            h1 { font-size: 18px; }
-        }
+        .key-wide { flex: 1.5; font-size: 12px; }
         
-        /* Ajuste para modo paisagem em mobile (altura pequena) */
-        @media (max-height: 500px) {
-            header { height: 35px; padding: 5px 15px; }
-            #game-container { padding: 2px; }
-            .key { height: 35px; }
-            #hint-container { padding: 4px 8px; margin-top: 5px; font-size: 11px; }
-            #message-area { height: 15px; font-size: 12px; margin-bottom: 2px; }
-        }
-
+        /* Cores do Teclado quando reveladas */
         .key.correct { background-color: var(--correct); border-color: var(--correct); }
         .key.present { background-color: var(--present); border-color: var(--present); }
         .key.absent { background-color: var(--absent); border-color: var(--absent); }
 
-        /* --- MODAL --- */
+        /* --- MODAL DE RESULTADO --- */
         #result-modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -242,7 +208,10 @@
             z-index: 100;
         }
         
-        #result-content { text-align: center; padding: 20px; }
+        #result-content {
+            text-align: center;
+            padding: 20px;
+        }
 
         button.restart-btn {
             margin-top: 20px;
@@ -260,23 +229,22 @@
 <body>
 
     <header>
-        <div style="width: 24px;"></div> <h1>FETISHDLE</h1>
+        <div></div> <h1>FETISHDLE</h1>
         <button class="theme-btn" onclick="toggleTheme()" id="theme-icon">☀️</button>
     </header>
 
     <div id="game-container">
         <div id="message-area"></div>
         
-        <div id="game-board-container">
-            <div id="game-board"></div>
-        </div>
+        <div id="game-board"></div>
 
         <div id="hint-container">
             DICA: <span id="hint-text">...</span>
         </div>
     </div>
 
-    <div id="keyboard-container"></div>
+    <div id="keyboard-container">
+        </div>
 
     <div id="result-modal">
         <div id="result-content">
@@ -317,7 +285,7 @@
         let currentRow = 0;
         let currentTile = 0;
         let isGameOver = false;
-        let isAnimating = false;
+        let isAnimating = false; // Bloqueia input durante animação
         const maxGuesses = 6;
 
         /* --- ELEMENTOS --- */
@@ -351,14 +319,19 @@
             const wordLength = currentWord.length;
             board.style.gridTemplateColumns = `repeat(${wordLength}, 1fr)`;
 
-            // NÃO usamos mais classes de tamanho fixo. O CSS 'tile' agora é fluido.
+            // Ajusta tamanho da letra para Mobile
+            let tileClass = "tile";
+            if (wordLength > 8) tileClass += " small-text";
+            if (wordLength > 12) tileClass += " tiny-text";
+
             for (let i = 0; i < maxGuesses * wordLength; i++) {
                 const tile = document.createElement('div');
-                tile.className = 'tile';
+                tile.className = tileClass;
                 tile.setAttribute('id', `tile-${i}`);
                 board.appendChild(tile);
             }
 
+            // Reseta teclado virtual
             createKeyboard();
         }
 
@@ -388,6 +361,7 @@
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'keyboard-row';
                 
+                // Adiciona Enter no começo da última linha
                 if (index === 2) {
                     const enterKey = createKeyElement("ENTER", "ENTER", true);
                     rowDiv.appendChild(enterKey);
@@ -398,6 +372,7 @@
                     rowDiv.appendChild(keyBtn);
                 });
 
+                // Adiciona Backspace no fim da última linha
                 if (index === 2) {
                     const backKey = createKeyElement("⌫", "BACKSPACE", true);
                     rowDiv.appendChild(backKey);
@@ -413,8 +388,7 @@
             btn.setAttribute('data-key', value);
             btn.className = isWide ? 'key key-wide' : 'key';
             
-            btn.onclick = (e) => {
-                e.preventDefault(); // Evita zoom no mobile
+            btn.onclick = () => {
                 if (value === 'ENTER') handleInput('ENTER');
                 else if (value === 'BACKSPACE') handleInput('BACKSPACE');
                 else handleInput(value);
@@ -447,7 +421,10 @@
                 const tile = document.getElementById(`tile-${currentTile}`);
                 tile.textContent = letter;
                 tile.classList.add('pop');
+                // Remove animation class after plays
                 setTimeout(() => tile.classList.remove('pop'), 100);
+                
+                // Borda de foco visual
                 tile.style.borderColor = "var(--text-color)";
                 currentTile++;
             }
@@ -467,26 +444,30 @@
         function checkRow() {
             const wordLength = currentWord.length;
             
+            // Verifica tamanho
             if (currentTile !== (currentRow + 1) * wordLength) {
                 showMessage("Poucas letras!");
                 shakeRow();
                 return;
             }
 
-            isAnimating = true;
+            // Inicia validação
+            isAnimating = true; // Bloqueia input
 
             let guess = "";
             const startTileId = currentRow * wordLength;
             
+            // Constrói a palavra do usuário
             for (let i = 0; i < wordLength; i++) {
                 guess += document.getElementById(`tile-${startTileId + i}`).textContent;
             }
 
+            // Lógica de Cores
             const guessArray = guess.split('');
             const wordArray = currentWord.split('');
             const tileStatus = new Array(wordLength).fill('absent');
             
-            // Marca Corretos
+            // 1. Marca Corretos (Verde)
             for (let i = 0; i < wordLength; i++) {
                 if (guessArray[i] === wordArray[i]) {
                     tileStatus[i] = 'correct';
@@ -495,7 +476,7 @@
                 }
             }
 
-            // Marca Presentes
+            // 2. Marca Presentes (Amarelo)
             for (let i = 0; i < wordLength; i++) {
                 if (guessArray[i] && wordArray.includes(guessArray[i])) {
                     tileStatus[i] = 'present';
@@ -503,25 +484,29 @@
                 }
             }
 
-            // Animação FLIP
+            // 3. Aplica Animação FLIP Sequencial
             for (let i = 0; i < wordLength; i++) {
                 const tile = document.getElementById(`tile-${startTileId + i}`);
                 const letter = tile.textContent;
                 const status = tileStatus[i];
 
                 setTimeout(() => {
+                    // Adiciona classe que roda 90deg
                     tile.classList.add('flip');
                     tile.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--default-bg');
                     tile.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--default-bg');
-                }, i * 250);
+                }, i * 250); // Delay cascata
 
+                // No meio da animação (quando carta está de lado), troca a cor
                 setTimeout(() => {
                     tile.classList.add(status);
-                    tile.classList.remove('flip');
-                    tile.style.transform = '';
+                    tile.classList.remove('flip'); // Volta a posição normal com a nova cor
+                    tile.style.transform = ''; // Limpa transform
                     
+                    // Atualiza Teclado Virtual
                     updateKeyboardColor(letter, status);
 
+                    // Se for a última letra, verifica fim de jogo
                     if (i === wordLength - 1) {
                         endTurnLogic(guess, wordLength);
                     }
@@ -533,6 +518,7 @@
             const keyBtn = document.querySelector(`button[data-key="${letter}"]`);
             if (!keyBtn) return;
 
+            // Prioridade de Cores: Correct > Present > Absent
             const currentClass = keyBtn.classList;
             if (status === 'correct') {
                 keyBtn.classList.remove('present', 'absent');
@@ -584,6 +570,7 @@
             resultModal.style.display = 'flex';
         }
 
+        // Inicia
         initGame();
 
     </script>
